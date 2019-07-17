@@ -180,3 +180,21 @@ findByTitleAndContents(String title, String contents);<br/>
 |TRUE|findByActiveTrue()|... where x.active = true|
 |FALSE|findByActiveFalse()|... where x.active = false|
 |IgnoreCase|findByFirstnameIgnoreCase|... where UPPER(x.firstname) = UPPER(?1)|
+
+<b>@Query 사용하기</b><br/>
+메서드 이름이 복잡하거나 쿼리 메서드로 표현하기 힘들다면 @Query 어노테이션으로 쿼리를 직접 작성할 수 있음. 이때 쿼리는 JPQL이나, 데이터베이스에 맞는 SQL을 이용할 수 있음. 쿼리를 작성할 메서드에 @Query 어노테이션을 적용하고 쿼리를 작성하면 됨<br/>
+
+@Query 어노테이션을 사용한 JPQL
+~~~java
+@Query("SELECT file FROM BoardFileEntity file WHERE board_idx = ?1 AND idx = ?2")
+BoardFileEntity findBoardFile(int boardIdx, int idx); ❶
+
+@Query("SELECT file FROM BoardFileEntity file WHERE board_idx = :boardIdx AND idx = :idx")
+BoardFileEntity findBoardFile(@Param("boardIdx") int boardIdx, @Param("idx") int idx); ❷
+~~~
+❶ [?숫자] 형식으로 파라미터를 지정함. 메서드의 파라미터 순서대로 각각 ?1, ?2에 해당됨. 즉, boardIdx는 ?1에 할당되고 idx는 ?2에 할당됨. 변수의 개수가 증가하면 숫자도 그만큼 증가함<br/>
+❷ :[변수이름]으로 파라미터를 지정함. 변수이름은 메서드의 @param 어노테이션에 대응됨. :boardIdx의 boardIdx 변수는 @Param("boardIdx") 어노테이션이 있는 메서드의 파라미터를 사용함<br/>
+
+일반적으로 두 번째 방식이 사용됨. 파라미터가 한두개만 존재하거나 쿼리가 간단할 경우에는 첫번째 방식을 사용하더라도 큰 문제가 없음. 하지만 파라미터의 개수가 많아지거나 쿼리의 길이가 길어질 경우에는 쿼리 파라미터와 메서드 파라미터를 쉽게 알아볼 수 없고 파라미터의 순서를 바꿔 입력하는 등의 예상치 못한 오류를 만들기도 쉬움. 따라서 두번째 방식을 이용해서 개발하는 것이 좋음<br/>
+
+JPQL을 작성할 때 유념해야 할 사항은 쿼리의 FROM 절에 데이터베이스의 테이블 이름이 아니라 검색하려는 엔티티의 이름을 사용한다는 것
