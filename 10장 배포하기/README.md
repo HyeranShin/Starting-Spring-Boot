@@ -188,7 +188,19 @@ logback-spring.xml
 ~~~java
 ...중략...
 </appender>
-<springProfile name="dev">
+<springProfile name="dev"> ❶
     <logger name="board" level="DEBUG" appender-ref="console"/>
-    
+    <logger name="jdbc.sqlonly" level="INFO"
+            appender-ref="console-infolog"/>
+    <logger name="jdbc.resultsettable" level="INFO"
+            appender-ref="console-infolog"/>
+</springProfile>
+<springProfile name="production"> ❷
+    <logger name="board" level="ERROR" appender-ref="console"/>
+</springProfile>
+
+<root level="error">
+...중략...
 ~~~
+❶ <springProfile> 태그를 이용해 개발환경의 로그를 설정함. name 속성은 각 환경별 application.properties와 마찬가지로 spring.profiles.active 속성값과 동일해야 함<br/>
+❷ 운영환경의 로그를 설정함. info 레벨로 출력되던 커리 및 결과 로거를 제거하고 일바 로거의 출력 레벨을 error로 변경함<br/>
